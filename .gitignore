@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Arduino
+*.hex
+*.bin
+
+# Build
+build/
+dist/
+
+# Temporary
+*.tmp
+
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc

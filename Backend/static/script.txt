@@ -1,0 +1,221 @@
+// ===============================
+// HELIOS-X Dashboard Controller
+// ===============================
+
+const score = document.getElementById("score");
+const helmet = document.getElementById("helmet");
+const alcohol = document.getElementById("alcohol");
+const total = document.getElementById("total");
+
+const historyTable = document.getElementById("historyTable");
+
+
+// Live Clock
+function updateClock() {
+
+    const now = new Date();
+
+    document.getElementById("currentTime").innerHTML =
+        now.toLocaleString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+
+// ---------------------------
+// Charts
+// ---------------------------
+
+const lineChart = new Chart(
+document.getElementById("lineChart"),{
+
+type:"line",
+
+data:{
+
+labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+
+datasets:[{
+
+label:"Violations",
+
+data:[0,0,0,0,0,0,0],
+
+borderColor:"#38bdf8",
+
+backgroundColor:"rgba(56,189,248,.2)",
+
+fill:true,
+
+tension:.4
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+plugins:{
+legend:{
+labels:{
+color:"white"
+}
+}
+},
+
+scales:{
+
+x:{
+ticks:{color:"white"}
+},
+
+y:{
+ticks:{color:"white"}
+}
+
+}
+
+}
+
+});
+
+
+
+const pieChart = new Chart(
+
+document.getElementById("pieChart"),{
+
+type:"pie",
+
+data:{
+
+labels:["Helmet","Alcohol"],
+
+datasets:[{
+
+data:[0,0],
+
+backgroundColor:[
+"#f97316",
+"#ef4444"
+]
+
+}]
+
+},
+
+options:{
+
+plugins:{
+
+legend:{
+
+labels:{
+color:"white"
+}
+
+}
+
+}
+
+}
+
+});
+
+
+
+
+// ----------------------------
+// Dashboard API
+// ----------------------------
+
+async function loadDashboard(){
+
+try{
+
+const response=await fetch("/api/dashboard");
+
+const data=await response.json();
+
+score.innerHTML=data.score;
+
+helmet.innerHTML=data.helmet;
+
+alcohol.innerHTML=data.alcohol;
+
+total.innerHTML=data.total;
+
+
+// Pie Chart
+
+pieChart.data.datasets[0].data=[
+data.helmet,
+data.alcohol
+];
+
+pieChart.update();
+
+
+// Dummy weekly data
+
+lineChart.data.datasets[0].data=[
+data.total,
+data.total,
+data.total,
+data.total,
+data.total,
+data.total,
+data.total
+];
+
+lineChart.update();
+
+
+// Table
+
+historyTable.innerHTML="";
+
+data.history.forEach(item=>{
+
+historyTable.innerHTML+=`
+
+<tr>
+
+<td>${item.timestamp}</td>
+
+<td>${item.type}</td>
+
+<td>
+
+<span style="color:#22c55e;">
+
+Recorded
+
+</span>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+
+
+loadDashboard();
+
+setInterval(loadDashboard,2000);
